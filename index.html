@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wiegand Song Player</title>
+    
+    <!-- Open Graph Meta Tags für Facebook -->
+    <meta property="og:title" content="Wiegand Song Player">
+    <meta property="og:description" content="Elektronische Musik von Harald Wiegand – Berlin School, Ambient & Synthesizer">
+    <meta property="og:image" content="https://harwie1962.github.io/wiegand-song-player/preview.png">
+    <meta property="og:url" content="https://harwie1962.github.io/wiegand-song-player/">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Wiegand Song Player">
+    <meta name="twitter:description" content="Elektronische Musik von Harald Wiegand">
+    <meta name="twitter:image" content="https://harwie1962.github.io/wiegand-song-player/preview.png">
     <style>
         * {
             margin: 0;
@@ -432,11 +445,27 @@
         // SONG-LISTE - HIER DEINE SONGS EINTRAGEN
         // ============================================
         const songs = [
-    { 
-        title: "UNEVEN ORBITS", 
-        url: "https://raw.githubusercontent.com/harwie1962/wiegand-song-player/main/Uneven%20Orbits.mp3"
-    }
-];
+            { 
+                title: "BERLIN NIGHTS #1", 
+                url: "https://example.com/songs/berlin-nights.mp3"
+            },
+            { 
+                title: "SEQUENCER DREAMS", 
+                url: "https://example.com/songs/sequencer-dreams.mp3"
+            },
+            { 
+                title: "ANALOG WAVES", 
+                url: "https://example.com/songs/analog-waves.mp3"
+            },
+            { 
+                title: "COSMIC JOURNEY", 
+                url: "https://example.com/songs/cosmic-journey.mp3"
+            },
+            { 
+                title: "SYNTH MEDITATION", 
+                url: "https://example.com/songs/synth-meditation.mp3"
+            }
+        ];
         // ============================================
 
         let currentSongIndex = 0;
