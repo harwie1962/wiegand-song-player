@@ -134,6 +134,11 @@
             pointer-events: none;
         }
 
+        .song-title-container {
+            overflow: hidden;
+            position: relative;
+        }
+
         .song-title {
             font-size: 22px;
             font-weight: bold;
@@ -144,8 +149,18 @@
             letter-spacing: 3px;
             text-transform: uppercase;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            display: inline-block;
+        }
+
+        .song-title.scrolling {
+            animation: marquee var(--scroll-duration, 8s) linear forwards;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            10% { transform: translateX(0); }
+            90% { transform: translateX(var(--scroll-distance, -100px)); }
+            100% { transform: translateX(var(--scroll-distance, -100px)); }
         }
 
         /* Controls */
@@ -391,7 +406,9 @@
             <!-- LCD Display -->
             <div class="display-frame">
                 <div class="display">
-                    <div class="song-title" id="songTitle">BERLIN NIGHTS #1</div>
+                    <div class="song-title-container">
+                        <div class="song-title" id="songTitle">BERLIN NIGHTS #1</div>
+                    </div>
                 </div>
             </div>
 
@@ -445,15 +462,15 @@
         // SONG-LISTE - HIER DEINE SONGS EINTRAGEN
         // ============================================
         const songs = [
-      { 
-        title: "UNEVEN ORBITS", 
-        url: "https://raw.githubusercontent.com/harwie1962/wiegand-song-player/main/audio/uneven-orbits.mp3"
-      },
-     { 
-        title: "SUBDIVISION OF SILENCE", 
-        url: "https://raw.githubusercontent.com/harwie1962/wiegand-song-player/main/audio/subdivision-of-silence.mp3"
-     }
-     ];
+            { 
+                title: "UNEVEN ORBITS", 
+                url: "https://raw.githubusercontent.com/harwie1962/wiegand-song-player/main/audio/uneven-orbits.mp3"
+            },
+            { 
+                title: "SUBDIVISION OF SILENCE", 
+                url: "https://raw.githubusercontent.com/harwie1962/wiegand-song-player/main/audio/subdivision-of-silence.mp3"
+            }
+        ];
         // ============================================
 
         let currentSongIndex = 0;
@@ -481,6 +498,43 @@
             return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
+        // Laufschrift-Variablen
+        let scrollInterval = null;
+        const titleContainer = document.querySelector('.song-title-container');
+
+        // Laufschrift starten wenn Titel zu lang
+        function startMarquee() {
+            // Vorherige Animation stoppen
+            songTitle.classList.remove('scrolling');
+            if (scrollInterval) clearInterval(scrollInterval);
+            
+            // Kurz warten damit DOM aktualisiert
+            setTimeout(() => {
+                const containerWidth = titleContainer.offsetWidth;
+                const titleWidth = songTitle.scrollWidth;
+                
+                // Nur scrollen wenn Titel breiter als Container
+                if (titleWidth > containerWidth) {
+                    const scrollDistance = titleWidth - containerWidth + 20;
+                    const scrollDuration = Math.max(5, scrollDistance / 30); // Geschwindigkeit anpassen
+                    
+                    songTitle.style.setProperty('--scroll-distance', `-${scrollDistance}px`);
+                    songTitle.style.setProperty('--scroll-duration', `${scrollDuration}s`);
+                    
+                    // Animation starten
+                    songTitle.classList.add('scrolling');
+                    
+                    // Nach Animation: Pause, dann wiederholen
+                    scrollInterval = setInterval(() => {
+                        songTitle.classList.remove('scrolling');
+                        setTimeout(() => {
+                            songTitle.classList.add('scrolling');
+                        }, 100);
+                    }, (scrollDuration + 10) * 1000); // 10 Sekunden Pause
+                }
+            }, 100);
+        }
+
         // Song laden
         function loadSong(index) {
             const song = songs[index];
@@ -489,6 +543,9 @@
             currentTimeEl.textContent = "0:00";
             durationEl.textContent = "0:00";
             progressBar.style.width = "0%";
+            
+            // Laufschrift starten
+            startMarquee();
         }
 
         // Play/Pause umschalten
