@@ -684,14 +684,14 @@
             }, 100);
         }
 
-        // Credit alle 20 Sekunden anzeigen (nur wenn Musik spielt)
+        // Credit alle 40 Sekunden anzeigen (nur wenn Musik spielt)
         function startCreditTimer() {
             if (creditInterval) clearInterval(creditInterval);
             creditInterval = setInterval(() => {
                 if (isPlaying) {
                     showCredit();
                 }
-            }, 20000); // Alle 20 Sekunden
+            }, 40000); // Alle 40 Sekunden
         }
 
         // Song laden
