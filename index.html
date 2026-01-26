@@ -573,12 +573,13 @@
                 title: "SUBDIVISION OF SILENCE", 
                 url: "https://raw.githubusercontent.com/harwie1962/wiegand-song-player/main/audio/subdivision-of-silence.mp3"
             },
-			 { 
+            { 
                 title: "STEPS BETWEEN TIME", 
                 url: "https://raw.githubusercontent.com/harwie1962/wiegand-song-player/main/audio/steps-between-time.mp3"
-			 }
-             ];
+            }
+        ];
         // ============================================
+
         let currentSongIndex = 0;
         let isPlaying = false;
 
@@ -653,24 +654,44 @@
             // Credit anzeigen
             songTitle.textContent = creditMessage;
             songTitle.classList.remove('scrolling');
-            startMarquee();
             
-            // Nach 6 Sekunden zurück zum Song-Titel
+            // Langsam durchlaufen lassen
             setTimeout(() => {
-                songTitle.textContent = currentTitle;
-                songTitle.classList.remove('scrolling');
-                startMarquee();
-            }, 6000);
+                const containerWidth = titleContainer.offsetWidth;
+                const titleWidth = songTitle.scrollWidth;
+                
+                if (titleWidth > containerWidth) {
+                    const scrollDistance = titleWidth - containerWidth + 20;
+                    const scrollDuration = Math.max(8, scrollDistance / 20); // Langsamer scrollen
+                    
+                    songTitle.style.setProperty('--scroll-distance', `-${scrollDistance}px`);
+                    songTitle.style.setProperty('--scroll-duration', `${scrollDuration}s`);
+                    songTitle.classList.add('scrolling');
+                    
+                    // Nach dem Durchlaufen zurück zum Song-Titel
+                    setTimeout(() => {
+                        songTitle.textContent = currentTitle;
+                        songTitle.classList.remove('scrolling');
+                        startMarquee();
+                    }, scrollDuration * 1000 + 1000);
+                } else {
+                    // Falls kurz genug, nach 5 Sekunden zurück
+                    setTimeout(() => {
+                        songTitle.textContent = currentTitle;
+                        startMarquee();
+                    }, 5000);
+                }
+            }, 100);
         }
 
-        // Credit alle 60 Sekunden anzeigen (nur wenn Musik spielt)
+        // Credit alle 40 Sekunden anzeigen (nur wenn Musik spielt)
         function startCreditTimer() {
             if (creditInterval) clearInterval(creditInterval);
             creditInterval = setInterval(() => {
                 if (isPlaying) {
                     showCredit();
                 }
-            }, 60000); // Alle 60 Sekunden
+            }, 40000); // Alle 40 Sekunden
         }
 
         // Song laden
