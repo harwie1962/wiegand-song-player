@@ -8,7 +8,7 @@
     <!-- Open Graph Meta Tags für Facebook -->
     <meta property="og:title" content="Wiegand Song Player">
     <meta property="og:description" content="Elektronische Musik von Harald Wiegand – Berlin School, Ambient & Synthesizer">
-   	<meta property="og:image" content="https://harwie1962.github.io/wiegand-song-player/preview.png?v=3">
+    <meta property="og:image" content="https://harwie1962.github.io/wiegand-song-player/preview.png">
     <meta property="og:url" content="https://harwie1962.github.io/wiegand-song-player/">
     <meta property="og:type" content="website">
     
@@ -641,9 +641,42 @@
             }, 100);
         }
 
+        // Credit-Nachricht
+        const creditMessage = "All songs composed and arranged by Harald Wiegand";
+        let creditInterval = null;
+        let currentTitle = "";
+
+        function showCredit() {
+            // Aktuellen Titel merken
+            currentTitle = songTitle.textContent;
+            
+            // Credit anzeigen
+            songTitle.textContent = creditMessage;
+            songTitle.classList.remove('scrolling');
+            startMarquee();
+            
+            // Nach 6 Sekunden zurück zum Song-Titel
+            setTimeout(() => {
+                songTitle.textContent = currentTitle;
+                songTitle.classList.remove('scrolling');
+                startMarquee();
+            }, 6000);
+        }
+
+        // Credit alle 60 Sekunden anzeigen (nur wenn Musik spielt)
+        function startCreditTimer() {
+            if (creditInterval) clearInterval(creditInterval);
+            creditInterval = setInterval(() => {
+                if (isPlaying) {
+                    showCredit();
+                }
+            }, 60000); // Alle 60 Sekunden
+        }
+
         // Song laden
         function loadSong(index) {
             const song = songs[index];
+            currentTitle = song.title;
             songTitle.textContent = song.title;
             audio.src = song.url;
             currentTimeEl.textContent = "0:00";
@@ -653,6 +686,9 @@
             // Laufschrift starten
             startMarquee();
         }
+
+        // Credit-Timer beim ersten Abspielen starten
+        let creditTimerStarted = false;
 
         // Play/Pause umschalten
         function togglePlay() {
@@ -693,6 +729,12 @@
             isPlaying = true;
             playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
             playBtn.classList.add('playing');
+            
+            // Credit-Timer starten (nur einmal)
+            if (!creditTimerStarted) {
+                creditTimerStarted = true;
+                startCreditTimer();
+            }
         });
 
         audio.addEventListener('pause', () => {
