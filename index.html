@@ -579,7 +579,6 @@
 			 }
              ];
         // ============================================
-
         let currentSongIndex = 0;
         let isPlaying = false;
 
@@ -719,7 +718,9 @@
 
         audio.addEventListener('ended', () => {
             if (autoNextEnabled) {
-                nextSong();
+                currentSongIndex = (currentSongIndex + 1) % songs.length;
+                loadSong(currentSongIndex);
+                audio.play(); // Direkt abspielen, ohne isPlaying-Check
             } else {
                 // Song stoppen, Icon zurücksetzen
                 isPlaying = false;
