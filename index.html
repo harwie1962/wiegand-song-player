@@ -381,6 +381,92 @@
             min-width: 35px;
             text-align: right;
         }
+
+        /* Playlist */
+        .playlist-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin: 0 50px;
+        }
+
+        .playlist-container.open {
+            max-height: 300px;
+            margin-top: 15px;
+        }
+
+        .playlist {
+            background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
+            border-radius: 8px;
+            padding: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .playlist-item {
+            padding: 10px 15px;
+            color: #888;
+            font-size: 13px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .playlist-item:hover {
+            background: rgba(255, 107, 53, 0.1);
+            color: #ccc;
+        }
+
+        .playlist-item.active {
+            background: rgba(95, 223, 207, 0.15);
+            color: #5fdfcf;
+        }
+
+        .playlist-item-number {
+            color: #555;
+            font-size: 11px;
+            min-width: 20px;
+        }
+
+        .playlist-item.active .playlist-item-number {
+            color: #ff6b35;
+        }
+
+        /* Scrollbar Styling */
+        .playlist::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .playlist::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 3px;
+        }
+
+        .playlist::-webkit-scrollbar-thumb {
+            background: #ff6b35;
+            border-radius: 3px;
+        }
+
+        #playlistBtn.active {
+            background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 100%);
+        }
+
+        #playlistBtn.active svg {
+            fill: #ff6b35;
+        }
+
+        /* Auto-Next Button */
+        #autoNextBtn.active {
+            background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 100%);
+        }
+
+        #autoNextBtn.active svg {
+            fill: #5fdfcf;
+        }
     </style>
 </head>
 <body>
@@ -436,6 +522,12 @@
 
             <!-- Controls -->
             <div class="controls">
+                <button class="btn-small" id="autoNextBtn" title="Auto-Next An/Aus">
+                    <svg viewBox="0 0 24 24" id="autoNextIcon">
+                        <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+                    </svg>
+                </button>
+
                 <button class="btn-small" id="prevBtn" title="Vorheriger Track">
                     <svg viewBox="0 0 24 24">
                         <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
@@ -453,6 +545,17 @@
                         <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
                     </svg>
                 </button>
+
+                <button class="btn-small" id="playlistBtn" title="Playlist">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Playlist -->
+            <div class="playlist-container" id="playlistContainer">
+                <div class="playlist" id="playlist"></div>
             </div>
         </div>
     </div>
@@ -474,7 +577,7 @@
                 title: "STEPS BETWEEN TIME", 
                 url: "https://raw.githubusercontent.com/harwie1962/wiegand-song-player/main/audio/steps-between-time.mp3"
 			 }
-        ];
+             ];
         // ============================================
 
         let currentSongIndex = 0;
@@ -609,8 +712,27 @@
             progressBar.style.width = `${progress}%`;
         });
 
+        // Auto-Next Einstellung
+        let autoNextEnabled = true;
+        const autoNextBtn = document.getElementById('autoNextBtn');
+        autoNextBtn.classList.add('active'); // Standard: An
+
         audio.addEventListener('ended', () => {
-            nextSong();
+            if (autoNextEnabled) {
+                nextSong();
+            } else {
+                // Song stoppen, Icon zurücksetzen
+                isPlaying = false;
+                playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+                playBtn.classList.remove('playing');
+            }
+        });
+
+        // Auto-Next Toggle
+        autoNextBtn.addEventListener('click', () => {
+            autoNextEnabled = !autoNextEnabled;
+            autoNextBtn.classList.toggle('active', autoNextEnabled);
+            autoNextBtn.title = autoNextEnabled ? 'Auto-Next: An' : 'Auto-Next: Aus';
         });
 
         // Progress Bar klickbar machen
@@ -705,7 +827,54 @@
             }
         });
 
+        // Playlist Funktionen
+        const playlistBtn = document.getElementById('playlistBtn');
+        const playlistContainer = document.getElementById('playlistContainer');
+        const playlist = document.getElementById('playlist');
+
+        // Playlist erstellen
+        function buildPlaylist() {
+            playlist.innerHTML = '';
+            songs.forEach((song, index) => {
+                const item = document.createElement('div');
+                item.className = 'playlist-item' + (index === currentSongIndex ? ' active' : '');
+                item.innerHTML = `
+                    <span class="playlist-item-number">${index + 1}</span>
+                    <span>${song.title}</span>
+                `;
+                item.addEventListener('click', () => {
+                    currentSongIndex = index;
+                    loadSong(currentSongIndex);
+                    audio.play();
+                    updatePlaylistActive();
+                });
+                playlist.appendChild(item);
+            });
+        }
+
+        // Aktiven Song in Playlist markieren
+        function updatePlaylistActive() {
+            const items = playlist.querySelectorAll('.playlist-item');
+            items.forEach((item, index) => {
+                item.classList.toggle('active', index === currentSongIndex);
+            });
+        }
+
+        // Playlist öffnen/schließen
+        playlistBtn.addEventListener('click', () => {
+            playlistContainer.classList.toggle('open');
+            playlistBtn.classList.toggle('active');
+        });
+
+        // Playlist bei Song-Wechsel aktualisieren
+        const originalLoadSong = loadSong;
+        loadSong = function(index) {
+            originalLoadSong(index);
+            updatePlaylistActive();
+        };
+
         // Initial Load
+        buildPlaylist();
         loadSong(currentSongIndex);
     </script>
 </body>
