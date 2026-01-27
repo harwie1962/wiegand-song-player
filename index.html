@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wiegand Song Player</title>
     
-<!-- Open Graph Meta Tags für Facebook -->
-<meta property="og:title" content="Wiegand Song Player">
-<meta property="og:description" content="Elektronische Musik von Harald Wiegand – Berlin School, Ambient & Synthesizer">
-<meta property="og:image" content="https://harwie1962.github.io/wiegand-song-player/preview.png?v=4">
-<meta property="og:url" content="https://harwie1962.github.io/wiegand-song-player/">
-<meta property="og:type" content="website">
-
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Wiegand Song Player">
-<meta name="twitter:description" content="Elektronische Musik von Harald Wiegand">
-<meta name="twitter:image" content="https://harwie1962.github.io/wiegand-song-player/preview.png?v=4">
+    <!-- Open Graph Meta Tags für Facebook -->
+    <meta property="og:title" content="Wiegand Song Player">
+    <meta property="og:description" content="Elektronische Musik von Harald Wiegand – Berlin School, Ambient & Synthesizer">
+    <meta property="og:image" content="https://harwie1962.github.io/wiegand-song-player/preview.png">
+    <meta property="og:url" content="https://harwie1962.github.io/wiegand-song-player/">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Wiegand Song Player">
+    <meta name="twitter:description" content="Elektronische Musik von Harald Wiegand">
+    <meta name="twitter:image" content="https://harwie1962.github.io/wiegand-song-player/preview.png">
     <style>
         * {
             margin: 0;
@@ -467,6 +467,161 @@
         #autoNextBtn.active svg {
             fill: #5fdfcf;
         }
+
+        /* VU-Meter */
+        .vu-meter {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 50px 0;
+        }
+
+        .vu-channel {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 3px;
+        }
+
+        .vu-label {
+            font-size: 10px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .vu-bar {
+            width: 20px;
+            height: 8px;
+            background: #1a1a1a;
+            border-radius: 2px;
+            transition: background 0.05s;
+        }
+
+        .vu-bar.green { background: #1a1a1a; }
+        .vu-bar.yellow { background: #1a1a1a; }
+        .vu-bar.red { background: #1a1a1a; }
+
+        .vu-bar.green.active { 
+            background: #35ff65; 
+            box-shadow: 0 0 8px rgba(53, 255, 101, 0.6);
+        }
+        .vu-bar.yellow.active { 
+            background: #fff535; 
+            box-shadow: 0 0 8px rgba(255, 245, 53, 0.6);
+        }
+        .vu-bar.red.active { 
+            background: #ff4444; 
+            box-shadow: 0 0 8px rgba(255, 68, 68, 0.6);
+        }
+
+        /* Download Button */
+        #downloadBtn svg {
+            fill: #666;
+        }
+
+        #downloadBtn:hover svg {
+            fill: #5fdfcf;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 520px) {
+            .player {
+                width: 95vw;
+                padding: 20px 15px;
+                border-radius: 10px;
+            }
+
+            .vents {
+                display: none;
+            }
+
+            .player-name {
+                font-size: 11px;
+                letter-spacing: 2px;
+                margin-bottom: 12px;
+            }
+
+            .display-frame {
+                margin: 0 10px 15px;
+            }
+
+            .display {
+                padding: 12px 15px;
+            }
+
+            .song-title {
+                font-size: 16px;
+                letter-spacing: 2px;
+            }
+
+            .progress-container {
+                margin: 8px 10px 0;
+            }
+
+            .track-info {
+                margin: 6px 10px 0;
+                font-size: 10px;
+            }
+
+            .vu-meter {
+                margin: 12px 10px 0;
+                gap: 10px;
+            }
+
+            .vu-bar {
+                width: 15px;
+                height: 6px;
+            }
+
+            .volume-container {
+                margin-top: 12px;
+                padding: 0 10px;
+                gap: 8px;
+            }
+
+            .volume-slider-container {
+                width: 140px;
+            }
+
+            .controls {
+                margin-top: 12px;
+                padding: 0 10px;
+                gap: 8px;
+            }
+
+            .btn-small {
+                width: 38px;
+                height: 38px;
+            }
+
+            .btn-small svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            .btn-play {
+                width: 55px;
+                height: 55px;
+            }
+
+            .btn-play svg {
+                width: 24px;
+                height: 24px;
+            }
+
+            .playlist-container {
+                margin: 0 10px;
+            }
+
+            .playlist-container.open {
+                margin-top: 12px;
+            }
+
+            .playlist-item {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -487,7 +642,7 @@
             </div>
 
             <!-- Player Name -->
-            <div class="player-name" id="playerName">[oakstreet]</div>
+            <div class="player-name" id="playerName">Wiegand Song Player</div>
 
             <!-- LCD Display -->
             <div class="display-frame">
@@ -507,6 +662,34 @@
             <div class="track-info">
                 <span id="currentTime">0:00</span>
                 <span id="duration">0:00</span>
+            </div>
+
+            <!-- VU-Meter -->
+            <div class="vu-meter">
+                <div class="vu-channel" id="vuLeft">
+                    <div class="vu-bar red"></div>
+                    <div class="vu-bar red"></div>
+                    <div class="vu-bar yellow"></div>
+                    <div class="vu-bar yellow"></div>
+                    <div class="vu-bar green"></div>
+                    <div class="vu-bar green"></div>
+                    <div class="vu-bar green"></div>
+                    <div class="vu-bar green"></div>
+                    <div class="vu-bar green"></div>
+                    <div class="vu-bar green"></div>
+                </div>
+                <div class="vu-channel" id="vuRight">
+                    <div class="vu-bar red"></div>
+                    <div class="vu-bar red"></div>
+                    <div class="vu-bar yellow"></div>
+                    <div class="vu-bar yellow"></div>
+                    <div class="vu-bar green"></div>
+                    <div class="vu-bar green"></div>
+                    <div class="vu-bar green"></div>
+                    <div class="vu-bar green"></div>
+                    <div class="vu-bar green"></div>
+                    <div class="vu-bar green"></div>
+                </div>
             </div>
 
             <!-- Volume Control -->
@@ -549,6 +732,12 @@
                 <button class="btn-small" id="playlistBtn" title="Playlist">
                     <svg viewBox="0 0 24 24">
                         <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                    </svg>
+                </button>
+
+                <button class="btn-small" id="downloadBtn" title="Download">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
                     </svg>
                 </button>
             </div>
@@ -643,7 +832,7 @@
         }
 
         // Credit-Nachricht
-        const creditMessage = "All songs composed by o||s";
+        const creditMessage = "All songs composed and arranged by Harald Wiegand";
         let creditInterval = null;
         let currentTitle = "";
 
@@ -936,6 +1125,98 @@
             originalLoadSong(index);
             updatePlaylistActive();
         };
+
+        // Download Button
+        const downloadBtn = document.getElementById('downloadBtn');
+        downloadBtn.addEventListener('click', () => {
+            const song = songs[currentSongIndex];
+            const link = document.createElement('a');
+            link.href = song.url;
+            link.download = song.title.toLowerCase().replace(/\s+/g, '-') + '.mp3';
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // VU-Meter
+        const vuLeft = document.getElementById('vuLeft');
+        const vuRight = document.getElementById('vuRight');
+        const vuBarsLeft = vuLeft.querySelectorAll('.vu-bar');
+        const vuBarsRight = vuRight.querySelectorAll('.vu-bar');
+        
+        let audioContext = null;
+        let analyser = null;
+        let dataArray = null;
+        let vuAnimationFrame = null;
+
+        function initAudioContext() {
+            if (audioContext) return;
+            
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            
+            const source = audioContext.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+        }
+
+        function updateVuMeter() {
+            if (!analyser || !isPlaying) {
+                // Reset VU-Meter wenn nicht spielt
+                vuBarsLeft.forEach(bar => bar.classList.remove('active'));
+                vuBarsRight.forEach(bar => bar.classList.remove('active'));
+                return;
+            }
+
+            analyser.getByteFrequencyData(dataArray);
+            
+            // Berechne Durchschnitt für linken und rechten Kanal (simuliert)
+            let sumLeft = 0;
+            let sumRight = 0;
+            const half = dataArray.length / 2;
+            
+            for (let i = 0; i < half; i++) {
+                sumLeft += dataArray[i];
+            }
+            for (let i = half; i < dataArray.length; i++) {
+                sumRight += dataArray[i];
+            }
+            
+            const levelLeft = Math.min(10, Math.floor((sumLeft / half / 255) * 12));
+            const levelRight = Math.min(10, Math.floor((sumRight / half / 255) * 12));
+            
+            // Update LED-Balken
+            vuBarsLeft.forEach((bar, index) => {
+                bar.classList.toggle('active', index < levelLeft);
+            });
+            vuBarsRight.forEach((bar, index) => {
+                bar.classList.toggle('active', index < levelRight);
+            });
+            
+            vuAnimationFrame = requestAnimationFrame(updateVuMeter);
+        }
+
+        // VU-Meter starten wenn Musik spielt
+        audio.addEventListener('play', () => {
+            initAudioContext();
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            updateVuMeter();
+        });
+
+        audio.addEventListener('pause', () => {
+            if (vuAnimationFrame) {
+                cancelAnimationFrame(vuAnimationFrame);
+            }
+            // Reset VU-Meter
+            vuBarsLeft.forEach(bar => bar.classList.remove('active'));
+            vuBarsRight.forEach(bar => bar.classList.remove('active'));
+        });
 
         // Initial Load
         buildPlaylist();
