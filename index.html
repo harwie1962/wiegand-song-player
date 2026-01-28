@@ -642,7 +642,7 @@
             </div>
 
             <!-- Player Name -->
-            <div class="player-name" id="playerName">Wiegand Song Player</div>
+            <div class="player-name" id="playerName">o||s Song Player</div>
 
             <!-- LCD Display -->
             <div class="display-frame">
@@ -989,11 +989,24 @@
         });
 
         // Progress Bar klickbar machen
-        progressContainer.addEventListener('click', (e) => {
+        function setProgress(e) {
             const rect = progressContainer.getBoundingClientRect();
-            const percent = (e.clientX - rect.left) / rect.width;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const percent = (clientX - rect.left) / rect.width;
             audio.currentTime = percent * audio.duration;
-        });
+        }
+
+        progressContainer.addEventListener('click', setProgress);
+
+        // Touch Support für Progress-Bar (Handy)
+        progressContainer.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            setProgress(e);
+        }, { passive: false });
+
+        progressContainer.addEventListener('touchmove', (e) => {
+            setProgress(e);
+        }, { passive: true });
 
         // Button Event Listeners
         playBtn.addEventListener('click', togglePlay);
@@ -1030,7 +1043,9 @@
 
         function setVolume(e) {
             const rect = volumeSlider.getBoundingClientRect();
-            let volume = (e.clientX - rect.left) / rect.width;
+            // Unterstütze sowohl Mouse als auch Touch
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let volume = (clientX - rect.left) / rect.width;
             volume = Math.max(0, Math.min(1, volume));
             audio.volume = volume;
             if (volume > 0) lastVolume = volume;
@@ -1039,7 +1054,7 @@
 
         volumeSlider.addEventListener('click', setVolume);
 
-        // Drag Support für Volume
+        // Drag Support für Volume (Mouse)
         let isDraggingVolume = false;
         volumeSlider.addEventListener('mousedown', (e) => {
             isDraggingVolume = true;
@@ -1053,6 +1068,23 @@
         });
 
         document.addEventListener('mouseup', () => {
+            isDraggingVolume = false;
+        });
+
+        // Touch Support für Volume (Handy)
+        volumeSlider.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isDraggingVolume = true;
+            setVolume(e);
+        }, { passive: false });
+
+        document.addEventListener('touchmove', (e) => {
+            if (isDraggingVolume) {
+                setVolume(e);
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', () => {
             isDraggingVolume = false;
         });
 
